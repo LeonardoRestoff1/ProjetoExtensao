@@ -1,0 +1,140 @@
+﻿@model IEnumerable<BibliotecaOnline.Models.Livro>
+@{
+    ViewData["Title"] = "Acervo";
+    ViewData["NavSection"] = "acervo";
+    var cat       = ViewBag.Categoria as string ?? "Todos";
+    var q         = ViewBag.Query     as string;
+    var disp      = ViewBag.Disponiveis as bool?;
+    var isAdmin   = ViewBag.IsAdmin   as bool? ?? false;
+    var categorias = ViewBag.Categorias as List<string> ?? new List<string>();
+    var roleKey   = Context.Session.GetString(SessionAuth.AuthRoleKey);
+}
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-start gap-3">
+    <div>
+        <h1 class="h3 mb-1"><i class="bi bi-collection me-2 text-primary"></i>Acervo</h1>
+        <p class="text-muted small mb-0">Pesquise por título, autor ou categoria e filtre os resultados</p>
+    </div>
+    @if (isAdmin)
+    {
+        <a asp-action="Create" class="btn btn-primary no-print">
+            <i class="bi bi-plus-circle me-1"></i>Cadastrar livro
+        </a>
+    }
+</div>
+
+<div class="app-panel p-4 mb-4">
+    @* Busca *@
+    <form asp-action="Index" method="get" class="mb-3" role="search" aria-label="Busca no acervo">
+        <div class="bib-search-wrap">
+            <span class="bi-placeholder" aria-hidden="true"><i class="bi bi-search"></i></span>
+            <label class="visually-hidden" for="q-acervo">Busca por título, autor ou categoria</label>
+            <input id="q-acervo" type="search" name="q" value="@q"
+                   class="form-control bib-search"
+                   placeholder="Título, autor ou categoria…"
+                   aria-label="Buscar livros" />
+            <button type="submit"
+                    class="btn btn-primary position-absolute end-0 top-50 translate-middle-y me-2 btn-sm no-print">
+                Buscar
+            </button>
+        </div>
+        @if (disp == true)                                      { <input type="hidden" name="disponiveis" value="true" /> }
+        @if (!string.IsNullOrEmpty(cat) && cat != "Todos")     { <input type="hidden" name="categoria" value="@cat" /> }
+    </form>
+
+    @* Filtros de categoria *@
+    <div class="d-flex flex-wrap gap-2 mb-4" role="group" aria-label="Filtrar por categoria">
+        <a class="btn btn-sm @(cat == "Todos" && disp != true ? "btn-primary" : "btn-outline-secondary")"
+           href="@Url.Action("Index", "Livros", new { q })">Todos</a>
+
+        @foreach (var p in categorias)
+        {
+            <a class="btn btn-sm @(cat == p && disp != true ? "btn-primary" : "btn-outline-secondary")"
+               href="@Url.Action("Index", "Livros", new { q, categoria = p })">@p</a>
+        }
+
+        <a class="btn btn-sm @(disp == true ? "btn-success" : "btn-outline-success")"
+           href="@Url.Action("Index", "Livros", new { q, disponiveis = true })">
+            <i class="bi bi-check-circle me-1"></i>Somente disponíveis
+        </a>
+    </div>
+
+    @* Grid de livros *@
+    @if (!Model.Any())
+    {
+        <div class="empty-state">
+            <i class="bi bi-search" style="font-size:2.5rem;opacity:.2;display:block;margin-bottom:.5rem"></i>
+            <p class="mb-2">Nenhum resultado para os filtros selecionados.</p>
+            <a href="@Url.Action("Index", "Livros")" class="btn btn-sm btn-outline-secondary">
+                Limpar filtros
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="row g-3">
+            @foreach (var livro in Model)
+            {
+                var disponivel = livro.Quantidade > 0;
+                <div class="col-md-4 col-sm-6">
+                    <div class="app-panel p-3 h-100 d-flex flex-column book-card">
+                        <div class="book-cover-placeholder mb-3">
+                            <i class="bi bi-book fs-2"></i>
+                        </div>
+                        <div class="fw-semibold mb-1">@livro.Titulo</div>
+                        <div class="text-muted small">@livro.Autor</div>
+                        @if (!string.IsNullOrEmpty(livro.Categoria))
+                        {
+                            <span class="badge bg-light text-secondary border mt-1 mb-2" style="width:fit-content;font-size:.7rem">
+                                @livro.Categoria
+                            </span>
+                        }
+                        else
+                        {
+                            <div class="mb-2"></div>
+                        }
+                        <div class="mb-2">
+                            @if (disponivel)
+                            {
+                                <span class="status-badge status-ativo">
+                                    <i class="bi bi-check-circle-fill"></i>Disponível
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="status-badge status-devolvido">
+                                    <i class="bi bi-x-circle"></i>Sem exemplares
+                                </span>
+                            }
+                        </div>
+                        <div class="mt-auto d-flex flex-wrap gap-2 align-items-center pt-2 border-top">
+                            <a asp-action="Details" asp-route-id="@livro.Id" class="small text-decoration-none">
+                                <i class="bi bi-info-circle me-1"></i>Detalhes
+                            </a>
+                            @if (roleKey == SessionAuth.RoleUser && disponivel)
+                            {
+                                <form asp-action="Solicitar" method="post" class="d-inline ms-auto">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@livro.Id" />
+                                    <button type="submit" class="btn btn-link btn-sm p-0 text-decoration-none">
+                                        <i class="bi bi-arrow-left-right me-1"></i>Solicitar
+                                    </button>
+                                </form>
+                            }
+                            else if (roleKey == SessionAuth.RoleUser && !disponivel)
+                            {
+                                <span class="small text-muted ms-auto">Indisponível</span>
+                            }
+                            @if (isAdmin)
+                            {
+                                <a asp-action="Edit" asp-route-id="@livro.Id" class="small text-decoration-none ms-auto">
+                                    <i class="bi bi-pencil me-1"></i>Editar
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

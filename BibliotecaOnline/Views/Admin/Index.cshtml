@@ -1,0 +1,150 @@
+@model BibliotecaOnline.ViewModels.AdminPainelViewModel
+@{
+    ViewData["Title"] = "Administração";
+    ViewData["NavSection"] = "admin";
+}
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-start gap-2">
+    <div>
+        <h1 class="h3 mb-1"><i class="bi bi-speedometer2 me-2 text-primary"></i>Painel de Administração</h1>
+        <p class="text-muted small mb-0">
+            Conectado como <strong>@Model.AdminNome</strong>
+        </p>
+    </div>
+    <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 align-self-center">
+        <i class="bi bi-shield-check me-1"></i>Administrador
+    </span>
+</div>
+
+@* ── KPIs ── *@
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+        <div class="stat-tile stat-tile-primary">
+            <div class="value">@Model.TotalLivros.ToString("N0")</div>
+            <div class="label"><i class="bi bi-collection me-1"></i>Exemplares no acervo</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="stat-tile stat-tile-success">
+            <div class="value">@Model.EmprestimosAtivos.ToString("N0")</div>
+            <div class="label"><i class="bi bi-bookmark-check me-1"></i>Empréstimos ativos</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="stat-tile stat-tile-primary" style="border-top-color:#6f42c1">
+            <div class="value">@Model.UsuariosRegistrados.ToString("N0")</div>
+            <div class="label"><i class="bi bi-people me-1"></i>Usuários cadastrados</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="stat-tile @(Model.EmprestimosAtrasados > 0 ? "stat-tile-danger" : "")">
+            <div class="value">@Model.EmprestimosAtrasados.ToString("N0")</div>
+            <div class="label"><i class="bi bi-exclamation-triangle me-1"></i>Em atraso</div>
+        </div>
+    </div>
+</div>
+
+@* ── Ações rápidas ── *@
+<div class="app-panel p-4 mb-4">
+    <h2 class="h6 text-uppercase text-muted fw-semibold mb-3">
+        <i class="bi bi-lightning-charge me-1"></i>Ações rápidas
+    </h2>
+    <div class="d-flex flex-wrap gap-2">
+        <a asp-controller="Livros"         asp-action="Create"   class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-plus-circle me-1"></i>Novo livro
+        </a>
+        <a asp-controller="Usuarios"       asp-action="Create"   class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-person-plus me-1"></i>Novo usuário
+        </a>
+        <a asp-controller="Administradores" asp-action="Create"  class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-shield-plus me-1"></i>Novo administrador
+        </a>
+        <a asp-controller="Emprestimos"    asp-action="Create"   class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left-right me-1"></i>Novo empréstimo
+        </a>
+        <a asp-controller="Emprestimos"    asp-action="Historico" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-clock-history me-1"></i>Histórico completo
+        </a>
+    </div>
+</div>
+
+@* ── Solicitações pendentes ── *@
+<div class="app-panel p-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <h2 class="h6 text-uppercase text-muted fw-semibold mb-0">
+            <i class="bi bi-hourglass-split me-1 text-warning"></i>Solicitações pendentes
+            @if (Model.Pendentes.Any())
+            {
+                <span class="badge bg-warning text-dark ms-1">@Model.Pendentes.Count()</span>
+            }
+        </h2>
+    </div>
+
+    @if (!Model.Pendentes.Any())
+    {
+        <div class="empty-state py-4">
+            <i class="bi bi-check2-circle" style="font-size:2.5rem;opacity:.25;display:block;margin-bottom:.5rem"></i>
+            <p class="mb-0 text-muted">Nenhuma solicitação pendente — tudo em dia!</p>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">Usuário</th>
+                        <th scope="col">Livro</th>
+                        <th scope="col">Solicitado em</th>
+                        <th scope="col" class="text-end">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var e in Model.Pendentes)
+                {
+                    <tr>
+                        <td>
+                            <i class="bi bi-person-circle me-1 text-muted"></i>
+                            @(e.Usuario?.Nome ?? "—")
+                        </td>
+                        <td>
+                            <i class="bi bi-book me-1 text-muted"></i>
+                            @(e.Livro?.Titulo ?? "—")
+                        </td>
+                        <td class="text-nowrap">@e.DataInicio.ToString("dd/MM/yyyy")</td>
+                        <td class="text-end text-nowrap">
+                            <form asp-controller="Emprestimos" asp-action="Aprovar" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@e.Id" />
+                                <button type="submit" class="btn btn-sm btn-success">
+                                    <i class="bi bi-check-lg me-1"></i>Aprovar
+                                </button>
+                            </form>
+                            <form asp-controller="Emprestimos" asp-action="Rejeitar" method="post" class="d-inline"
+                                  onsubmit="return confirm('Rejeitar esta solicitação?');">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@e.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-x-lg me-1"></i>Rejeitar
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2 mt-4 pt-3 border-top">
+            <a asp-controller="Emprestimos" asp-action="Index"   class="btn btn-sm btn-primary">
+                <i class="bi bi-list-check me-1"></i>Lista de empréstimos
+            </a>
+            <a asp-controller="Usuarios"    asp-action="Index"   class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-people me-1"></i>Lista de usuários
+            </a>
+            <a asp-controller="Livros"      asp-action="Index"   class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-collection me-1"></i>Acervo
+            </a>
+        </div>
+    }
+</div>

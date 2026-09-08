@@ -1,0 +1,36 @@
+@model BibliotecaOnline.Models.Emprestimo
+
+@{
+    ViewData["Title"] = "Confirmar devolução";
+}
+
+<div class="page-header">
+    <h1 class="h3 mb-1">Confirmar devolução</h1>
+    <p class="text-muted small mb-0">Confira os dados antes de registrar a devolução no acervo</p>
+</div>
+
+<div class="app-panel p-4">
+    <dl class="row mb-4">
+        <dt class="col-sm-3 text-muted">Usuário</dt>
+        <dd class="col-sm-9">@Model.Usuario?.Nome</dd>
+        <dt class="col-sm-3 text-muted">Livro</dt>
+        <dd class="col-sm-9">@Model.Livro?.Titulo</dd>
+        <dt class="col-sm-3 text-muted">@Html.DisplayNameFor(model => model.DataInicio)</dt>
+        <dd class="col-sm-9">@Model.DataInicio.ToString("dd/MM/yyyy")</dd>
+        <dt class="col-sm-3 text-muted">@Html.DisplayNameFor(model => model.DataFim)</dt>
+        <dd class="col-sm-9">
+            @Model.DataFim.ToString("dd/MM/yyyy")
+            @if (Model.DataFim < DateTime.Now)
+            {
+                <span class="badge text-bg-light border text-dark ms-2">Atrasado</span>
+            }
+        </dd>
+    </dl>
+
+    <form asp-action="Devolver" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
+        <button type="submit" class="btn btn-success">Confirmar devolução</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+    </form>
+</div>

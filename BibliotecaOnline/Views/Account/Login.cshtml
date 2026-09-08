@@ -1,0 +1,82 @@
+@model BibliotecaOnline.ViewModels.LoginViewModel
+@{
+    ViewData["Title"] = "Entrar";
+    ViewData["NavSection"] = "login";
+}
+
+<div class="row justify-content-center py-lg-4">
+    <div class="col-md-8 col-lg-5">
+        <div class="app-panel p-4 p-md-5 auth-card">
+
+            <div class="text-center mb-4">
+                <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10 mb-3"
+                      style="width:3.5rem;height:3.5rem">
+                    <i class="bi bi-person-lock fs-4 text-primary"></i>
+                </span>
+                <h1 class="h4 mb-1">Acesso ao sistema</h1>
+                <p class="text-muted small mb-0">Informe o e-mail e a senha cadastrados</p>
+            </div>
+
+            <form asp-action="Login" method="post" novalidate>
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger small py-2 mb-3" role="alert"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Login" class="form-label fw-medium">
+                        <i class="bi bi-envelope me-1 text-muted"></i>E-mail
+                    </label>
+                    <input asp-for="Login" class="form-control" type="email"
+                           autocomplete="username" placeholder="nome@exemplo.com"
+                           aria-describedby="loginHelp" />
+                    <span asp-validation-for="Login" class="text-danger small" role="alert"></span>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="Senha" class="form-label fw-medium">
+                        <i class="bi bi-lock me-1 text-muted"></i>Senha
+                    </label>
+                    <div class="input-group">
+                        <input asp-for="Senha" class="form-control" id="senhaInput"
+                               autocomplete="current-password" placeholder="••••••••" />
+                        <button class="btn btn-outline-secondary" type="button" id="toggleSenha"
+                                aria-label="Mostrar ou ocultar senha">
+                            <i class="bi bi-eye" id="senhaIcon"></i>
+                        </button>
+                    </div>
+                    <span asp-validation-for="Senha" class="text-danger small" role="alert"></span>
+                </div>
+
+                <div class="d-grid mb-3">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="bi bi-box-arrow-in-right me-1"></i>Entrar
+                    </button>
+                </div>
+            </form>
+
+            <div class="divider-text my-3">ou</div>
+
+            <div class="text-center small">
+                Ainda não tem conta?
+                <a asp-action="Register" class="text-decoration-none fw-medium">Criar conta grátis</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        document.getElementById('toggleSenha').addEventListener('click', function () {
+            var input = document.getElementById('senhaInput');
+            var icon  = document.getElementById('senhaIcon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'bi bi-eye-slash';
+                this.setAttribute('aria-label', 'Ocultar senha');
+            } else {
+                input.type = 'password';
+                icon.className = 'bi bi-eye';
+                this.setAttribute('aria-label', 'Mostrar senha');
+            }
+        });
+    </script>
+}

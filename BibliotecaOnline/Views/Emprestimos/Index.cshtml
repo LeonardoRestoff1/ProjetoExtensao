@@ -1,0 +1,119 @@
+@model IEnumerable<BibliotecaOnline.Models.Emprestimo>
+@{
+    ViewData["Title"] = "Operação de empréstimos";
+    ViewData["NavSection"] = "emprestimos";
+}
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-start gap-3">
+    <div>
+        <h1 class="h3 mb-1">
+            <i class="bi bi-list-check me-2 text-primary"></i>Operação de empréstimos
+        </h1>
+        <p class="text-muted small mb-0">Registros confirmados — solicitações pendentes ficam no painel</p>
+    </div>
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-1"></i>Novo empréstimo
+    </a>
+</div>
+
+<div class="app-panel p-4 mb-4">
+    <form asp-action="Index" method="get" class="row g-3 align-items-end" role="search">
+        <div class="col-md-10">
+            <label class="form-label" for="filtro-emp">
+                <i class="bi bi-search me-1 text-muted"></i>Usuário ou livro
+            </label>
+            <input id="filtro-emp" type="search" name="filtro" class="form-control"
+                   value="@ViewBag.Filtro" placeholder="Nome do usuário ou título do livro" />
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-outline-primary w-100">Filtrar</button>
+        </div>
+    </form>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="app-panel p-4">
+        <div class="empty-state">
+            <i class="bi bi-inbox" style="font-size:2.5rem;opacity:.2;display:block;margin-bottom:.5rem"></i>
+            <p class="mb-0">Nenhum empréstimo encontrado para o filtro aplicado.</p>
+        </div>
+    </div>
+}
+else
+{
+    <div class="app-panel p-0 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">Usuário</th>
+                        <th scope="col">Livro</th>
+                        <th scope="col">Início</th>
+                        <th scope="col">Vencimento</th>
+                        <th scope="col">Devolvido em</th>
+                        <th scope="col">Status</th>
+                        <th scope="col" class="text-end">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var item in Model)
+                {
+                    string badgeClass; string badgeIcon; string statusText;
+
+                    if (item.DataDevolucaoReal != null)
+                    {
+                        badgeClass = "status-devolvido"; badgeIcon = "bi-check2"; statusText = "Devolvido";
+                    }
+                    else if (item.DataFim < DateTime.Now)
+                    {
+                        badgeClass = "status-atrasado"; badgeIcon = "bi-exclamation-triangle-fill"; statusText = "Atrasado";
+                    }
+                    else
+                    {
+                        badgeClass = "status-ativo"; badgeIcon = "bi-bookmark-check-fill"; statusText = "Em curso";
+                    }
+
+                    <tr>
+                        <td>
+                            <i class="bi bi-person-circle me-1 text-muted small"></i>
+                            @item.Usuario?.Nome
+                        </td>
+                        <td>@item.Livro?.Titulo</td>
+                        <td class="text-nowrap">@item.DataInicio.ToString("dd/MM/yyyy")</td>
+                        <td class="text-nowrap">@item.DataFim.ToString("dd/MM/yyyy")</td>
+                        <td class="text-nowrap">
+                            @if (item.DataDevolucaoReal.HasValue)
+                            {
+                                @item.DataDevolucaoReal.Value.ToString("dd/MM/yyyy")
+                            }
+                            else
+                            {
+                                <span class="text-muted">—</span>
+                            }
+                        </td>
+                        <td>
+                            <span class="status-badge @badgeClass">
+                                <i class="bi @badgeIcon"></i>@statusText
+                            </span>
+                        </td>
+                        <td class="text-end text-nowrap">
+                            <a asp-action="Details" asp-route-id="@item.Id"
+                               class="btn btn-sm btn-outline-secondary me-1">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            @if (item.DataDevolucaoReal == null)
+                            {
+                                <a asp-action="Devolver" asp-route-id="@item.Id"
+                                   class="btn btn-sm btn-success">
+                                    <i class="bi bi-box-arrow-in-down me-1"></i>Devolver
+                                </a>
+                            }
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

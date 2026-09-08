@@ -1,0 +1,8 @@
+# GitHub Pages configuration
+title: "Biblioteca Online"
+description: "Sistema web de gestão de acervo e empréstimos — Projeto de Extensão ASP.NET Core 8"
+theme: minima
+
+# Não processar o HTML como Jekyll template (já é HTML puro)
+include:
+  - index.html

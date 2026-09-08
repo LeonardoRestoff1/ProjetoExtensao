@@ -1,0 +1,160 @@
+@{
+    ViewData["Title"] = "Meus empréstimos";
+    ViewData["NavSection"] = "meus";
+    var ativos    = ViewBag.Ativos   as List<BibliotecaOnline.Models.Emprestimo> ?? new();
+    var historico = ViewBag.Historico as List<BibliotecaOnline.Models.Emprestimo> ?? new();
+}
+
+<div class="page-header">
+    <h1 class="h3 mb-1">
+        <i class="bi bi-bookmark-star me-2 text-primary"></i>Meus empréstimos
+    </h1>
+    <p class="text-muted small mb-0">Empréstimos em aberto e histórico de devoluções</p>
+</div>
+
+@* ── Em aberto ── *@
+<div class="app-panel p-4 mb-4">
+    <h2 class="h6 text-uppercase text-muted fw-semibold mb-3">
+        <i class="bi bi-hourglass-split me-1"></i>Em aberto
+        @if (ativos.Any())
+        {
+            <span class="badge bg-primary-subtle text-primary border border-primary-subtle ms-1">@ativos.Count</span>
+        }
+    </h2>
+
+    @if (!ativos.Any())
+    {
+        <div class="empty-state py-3">
+            <i class="bi bi-inbox" style="font-size:2rem;opacity:.25;display:block;margin-bottom:.5rem"></i>
+            <p class="mb-2 text-muted">Você não possui empréstimos em aberto.</p>
+            <a asp-controller="Livros" asp-action="Index" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-search me-1"></i>Explorar acervo
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 table-responsive-stack">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">Livro</th>
+                        <th scope="col">Início</th>
+                        <th scope="col">Vencimento</th>
+                        <th scope="col">Status</th>
+                        <th scope="col" class="text-end">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var e in ativos)
+                {
+                    var titulo = e.Livro != null ? $"{e.Livro.Titulo} — {e.Livro.Autor}" : "—";
+                    string badgeClass; string badgeIcon; string statusText;
+
+                    if (e.AguardandoAprovacao)
+                    {
+                        badgeClass = "status-pendente";
+                        badgeIcon  = "bi-hourglass-split";
+                        statusText = "Pendente";
+                    }
+                    else if (e.DataFim < DateTime.Today)
+                    {
+                        badgeClass = "status-atrasado";
+                        badgeIcon  = "bi-exclamation-triangle-fill";
+                        statusText = "Atrasado";
+                    }
+                    else
+                    {
+                        badgeClass = "status-ativo";
+                        badgeIcon  = "bi-check-circle-fill";
+                        statusText = "Ativo";
+                    }
+
+                    <tr>
+                        <td data-label="Livro">@titulo</td>
+                        <td data-label="Início" class="text-nowrap">@e.DataInicio.ToString("dd/MM/yyyy")</td>
+                        <td data-label="Vencimento" class="text-nowrap">@e.DataFim.ToString("dd/MM/yyyy")</td>
+                        <td data-label="Status">
+                            <span class="status-badge @badgeClass">
+                                <i class="bi @badgeIcon"></i>@statusText
+                            </span>
+                        </td>
+                        <td class="text-end text-nowrap" data-label="Ações">
+                            @if (!e.AguardandoAprovacao && e.DataDevolucaoReal == null)
+                            {
+                                @if (e.DataFim >= DateTime.Today)
+                                {
+                                    <form asp-controller="Emprestimos" asp-action="Renovar" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@e.Id" />
+                                        <button type="submit" class="btn btn-link btn-sm p-0 me-2 text-decoration-none">
+                                            <i class="bi bi-arrow-repeat me-1"></i>Renovar
+                                        </button>
+                                    </form>
+                                }
+                                <a asp-controller="Emprestimos" asp-action="Devolver" asp-route-id="@e.Id"
+                                   class="btn btn-link btn-sm p-0 text-decoration-none">
+                                    <i class="bi bi-box-arrow-in-down me-1"></i>Devolver
+                                </a>
+                            }
+                            else if (e.AguardandoAprovacao)
+                            {
+                                <span class="small text-muted fst-italic">Aguardando aprovação</span>
+                            }
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+@* ── Histórico ── *@
+<div class="app-panel p-4">
+    <h2 class="h6 text-uppercase text-muted fw-semibold mb-3">
+        <i class="bi bi-clock-history me-1"></i>Histórico de devoluções
+        @if (historico.Any())
+        {
+            <span class="badge bg-secondary-subtle text-secondary border ms-1">@historico.Count</span>
+        }
+    </h2>
+
+    @if (!historico.Any())
+    {
+        <p class="text-muted small mb-0">Nenhuma devolução registrada ainda.</p>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 table-responsive-stack">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">Livro</th>
+                        <th scope="col">Empréstimo</th>
+                        <th scope="col">Devolução</th>
+                        <th scope="col">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var e in historico)
+                {
+                    var titulo = e.Livro != null ? $"{e.Livro.Titulo} — {e.Livro.Autor}" : "—";
+                    <tr>
+                        <td data-label="Livro">@titulo</td>
+                        <td data-label="Empréstimo" class="text-nowrap">@e.DataInicio.ToString("dd/MM/yyyy")</td>
+                        <td data-label="Devolução"  class="text-nowrap">
+                            @(e.DataDevolucaoReal?.ToString("dd/MM/yyyy") ?? "—")
+                        </td>
+                        <td data-label="Status">
+                            <span class="status-badge status-devolvido">
+                                <i class="bi bi-check2"></i>Devolvido
+                            </span>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

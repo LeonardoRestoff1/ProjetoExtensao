@@ -1,0 +1,279 @@
+/* ============================================================
+   BibliotecaOnline — site.css  (refinado para produção)
+   ============================================================ */
+
+/* --- Base --------------------------------------------------- */
+html {
+  font-size: 15px;
+  position: relative;
+  min-height: 100%;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.app-body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f4f6f8;
+  color: #212529;
+}
+
+.app-main {
+  flex: 1 0 auto;
+}
+
+.app-footer {
+  flex-shrink: 0;
+}
+
+/* --- Navbar ------------------------------------------------- */
+.navbar-brand {
+  letter-spacing: -0.01em;
+}
+
+.navbar-brand i {
+  vertical-align: -0.1em;
+}
+
+.navbar .nav-link.active {
+  color: var(--bs-primary) !important;
+  font-weight: 600;
+}
+
+/* --- Cabeçalho de página ----------------------------------- */
+.page-header {
+  margin-bottom: 1.5rem;
+}
+
+.page-header h1 {
+  font-weight: 600;
+  color: #1a1d21;
+}
+
+/* --- Painéis / cards --------------------------------------- */
+.app-panel {
+  background: #fff;
+  border-radius: 0.625rem;
+  border: 1px solid #e9ecef;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+/* --- Foco acessível ---------------------------------------- */
+.btn:focus-visible,
+.form-control:focus {
+  box-shadow: 0 0 0 0.1rem #fff, 0 0 0 0.25rem rgba(13, 110, 253, 0.3);
+  outline: none;
+}
+
+/* --- Stat tiles (KPIs) ------------------------------------- */
+.stat-tile {
+  text-align: center;
+  padding: 1.1rem 0.75rem;
+  border-radius: 0.625rem;
+  background: #fff;
+  border: 1px solid #e9ecef;
+  transition: box-shadow 0.15s ease;
+}
+
+.stat-tile:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.stat-tile .value {
+  font-size: 1.9rem;
+  font-weight: 700;
+  line-height: 1.15;
+  color: #1a1d21;
+}
+
+.stat-tile .label {
+  font-size: 0.8rem;
+  color: #6c757d;
+  margin-top: 0.25rem;
+}
+
+/* stat-tile variantes coloridas (painel admin) */
+.stat-tile-primary  { border-top: 3px solid var(--bs-primary); }
+.stat-tile-success  { border-top: 3px solid var(--bs-success); }
+.stat-tile-warning  { border-top: 3px solid var(--bs-warning); }
+.stat-tile-danger   { border-top: 3px solid var(--bs-danger);  }
+
+/* --- Capas de livro --------------------------------------- */
+.book-cover-placeholder {
+  height: 130px;
+  border-radius: 0.5rem;
+  background: linear-gradient(135deg, #e7f1ff 0%, #f8f9fa 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0d6efd;
+  border: 1px dashed #cfe2ff;
+  font-size: 2.25rem;
+}
+
+.book-card {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.book-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* --- Barra de busca --------------------------------------- */
+.bib-search-wrap {
+  position: relative;
+}
+
+.bib-search {
+  border-radius: 2rem !important;
+  padding-left: 2.6rem !important;
+  padding-right: 5.5rem !important;
+  height: 2.6rem;
+}
+
+.bib-search-wrap .bi-placeholder {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.4;
+  pointer-events: none;
+  font-size: 0.95rem;
+}
+
+/* --- Card de autenticação --------------------------------- */
+.auth-card {
+  max-width: 440px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* --- Badges de status dos empréstimos --------------------- */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.3em 0.7em;
+  border-radius: 1rem;
+  white-space: nowrap;
+}
+
+.status-ativo {
+  background-color: #d1e7dd;
+  color: #0a3622;
+  border: 1px solid #a3cfbb;
+}
+
+.status-pendente {
+  background-color: #fff3cd;
+  color: #664d03;
+  border: 1px solid #ffe69c;
+}
+
+.status-atrasado {
+  background-color: #f8d7da;
+  color: #58151c;
+  border: 1px solid #f1aeb5;
+}
+
+.status-devolvido {
+  background-color: #e2e3e5;
+  color: #41464b;
+  border: 1px solid #c4c8cb;
+}
+
+/* --- Tabelas mobile --------------------------------------- */
+@media (max-width: 575.98px) {
+  .table-responsive-stack thead {
+    display: none;
+  }
+
+  .table-responsive-stack tr {
+    display: block;
+    border-bottom: 2px solid #dee2e6;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.75rem;
+  }
+
+  .table-responsive-stack td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: none;
+    padding: 0.3rem 0;
+    font-size: 0.875rem;
+  }
+
+  .table-responsive-stack td[data-label]::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #6c757d;
+    flex-shrink: 0;
+    margin-right: 0.5rem;
+  }
+}
+
+/* --- Alertas de feedback ---------------------------------- */
+.alert {
+  border-radius: 0.5rem;
+}
+
+/* --- Breadcrumb ------------------------------------------- */
+.breadcrumb {
+  font-size: 0.875rem;
+}
+
+/* --- Empty state ------------------------------------------ */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #6c757d;
+}
+
+.empty-state i {
+  font-size: 2.5rem;
+  opacity: 0.3;
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+/* --- Divider text ----------------------------------------- */
+.divider-text {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #6c757d;
+  font-size: 0.8rem;
+}
+
+.divider-text::before,
+.divider-text::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #dee2e6;
+}
+
+/* --- Impressão -------------------------------------------- */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .app-body {
+    background: #fff;
+  }
+
+  .app-panel {
+    box-shadow: none;
+    border: 1px solid #ccc;
+  }
+}

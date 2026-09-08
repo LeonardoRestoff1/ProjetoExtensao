@@ -1,0 +1,64 @@
+@model BibliotecaOnline.Models.Emprestimo
+
+@{
+    ViewData["Title"] = "Detalhes do empréstimo";
+}
+
+<div class="page-header">
+    <h1 class="h3 mb-1">Empréstimo #@Model.Id</h1>
+    <p class="text-muted small mb-0">Dados da movimentação</p>
+</div>
+
+<div class="app-panel p-4">
+    <dl class="row mb-0">
+        <dt class="col-sm-3 text-muted">Usuário</dt>
+        <dd class="col-sm-9">@Model.Usuario?.Nome</dd>
+        <dt class="col-sm-3 text-muted">Livro</dt>
+        <dd class="col-sm-9">@Model.Livro?.Titulo</dd>
+        <dt class="col-sm-3 text-muted">@Html.DisplayNameFor(model => model.DataInicio)</dt>
+        <dd class="col-sm-9">@Model.DataInicio.ToString("dd/MM/yyyy")</dd>
+        <dt class="col-sm-3 text-muted">@Html.DisplayNameFor(model => model.DataFim)</dt>
+        <dd class="col-sm-9">@Model.DataFim.ToString("dd/MM/yyyy")</dd>
+        <dt class="col-sm-3 text-muted">@Html.DisplayNameFor(model => model.DataDevolucaoReal)</dt>
+        <dd class="col-sm-9">
+            @if (Model.DataDevolucaoReal.HasValue)
+            {
+                @Model.DataDevolucaoReal.Value.ToString("dd/MM/yyyy")
+            }
+            else
+            {
+                <span class="text-muted">Em aberto</span>
+            }
+        </dd>
+        <dt class="col-sm-3 text-muted">Status</dt>
+        <dd class="col-sm-9">
+            @if (Model.DataDevolucaoReal == null)
+            {
+                @if (Model.AguardandoAprovacao)
+                {
+                    <span class="badge text-bg-secondary">Pendente de aprovação</span>
+                }
+                else if (Model.DataFim < DateTime.Now)
+                {
+                    <span class="badge text-bg-light border text-dark">Atrasado</span>
+                }
+                else
+                {
+                    <span class="badge text-bg-warning text-dark">Em curso</span>
+                }
+            }
+            else
+            {
+                <span class="badge text-bg-light border text-dark">Devolvido</span>
+            }
+        </dd>
+    </dl>
+
+    <div class="mt-4 pt-3 border-top">
+        @if (Model.DataDevolucaoReal == null && !Model.AguardandoAprovacao)
+        {
+            <a asp-action="Devolver" asp-route-id="@Model.Id" class="btn btn-success">Registrar devolução</a>
+        }
+        <a asp-action="Index" class="btn btn-outline-secondary">Lista de empréstimos</a>
+    </div>
+</div>

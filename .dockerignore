@@ -1,0 +1,16 @@
+**/.vs
+**/.vscode
+**/bin
+**/obj
+**/*.db
+**/*.db-shm
+**/*.db-wal
+**/*.log
+**/*.user
+**/publish
+**/out
+**/.git
+**/.gitignore
+**/Thumbs.db
+**/.DS_Store
+docs/

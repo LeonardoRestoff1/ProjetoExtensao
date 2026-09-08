@@ -1,0 +1,125 @@
+﻿@{
+    var role = Context.Session.GetString(SessionAuth.AuthRoleKey);
+    var userName = Context.Session.GetString(SessionAuth.UserNameKey);
+    var nav = ViewData["NavSection"] as string ?? "";
+}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] · Biblioteca Online</title>
+    <link rel="icon" type="image/svg+xml" href="~/favicon.svg" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/BibliotecaOnline.styles.css" asp-append-version="true" />
+    <meta name="description" content="Sistema de gestão de acervo e empréstimos de livros." />
+</head>
+<body class="app-body">
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm">
+            <div class="container">
+                <a class="navbar-brand fw-semibold text-primary" asp-controller="Home" asp-action="Index">
+                    <i class="bi bi-book-half me-1"></i>Biblioteca Online
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Abrir menu">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="mainNav">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link @(nav == "home" ? "active" : "")" asp-controller="Home" asp-action="Index">Início</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(nav == "acervo" ? "active" : "")" asp-controller="Livros" asp-action="Index">Acervo</a>
+                        </li>
+                        @if (role == SessionAuth.RoleUser)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link @(nav == "meus" ? "active" : "")" asp-controller="Emprestimos" asp-action="MeusEmprestimos">Meus empréstimos</a>
+                            </li>
+                        }
+                        @if (role == SessionAuth.RoleAdmin)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link @(nav == "admin" ? "active" : "")" asp-controller="Admin" asp-action="Index">Administração</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @(nav == "emprestimos" ? "active" : "")" asp-controller="Emprestimos" asp-action="Index">Empréstimos</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @(nav == "usuarios" ? "active" : "")" asp-controller="Usuarios" asp-action="Index">Usuários</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @(nav == "administradores" ? "active" : "")" asp-controller="Administradores" asp-action="Index">Administradores</a>
+                            </li>
+                        }
+                    </ul>
+                    <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+                        @if (string.IsNullOrEmpty(userName))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link @(nav == "login" ? "active" : "")" asp-controller="Account" asp-action="Login">Entrar</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="btn btn-outline-primary btn-sm rounded-pill px-3" asp-controller="Account" asp-action="Register">Cadastrar</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <span class="navbar-text small">
+                                    @if (role == SessionAuth.RoleAdmin)
+                                    {
+                                        <span class="text-muted">Administrador:</span>
+                                    }
+                                    <strong class="ms-1">@userName</strong>
+                                </span>
+                            </li>
+                            <li class="nav-item">
+                                <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-link nav-link py-0">Sair</button>
+                                </form>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container app-main py-4">
+        <main role="main">
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+                </div>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+                </div>
+            }
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="app-footer border-top py-3 mt-auto bg-white">
+        <div class="container d-flex flex-wrap justify-content-between align-items-center gap-2 small text-muted">
+            <span><i class="bi bi-book-half me-1 text-primary"></i>Biblioteca Online &middot; @DateTime.Now.Year</span>
+            <span>Projeto de Extensão &middot; ASP.NET Core 8 + SQLite</span>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,76 @@
+@model IEnumerable<BibliotecaOnline.Models.Emprestimo>
+
+@{
+    ViewData["Title"] = "Histórico de empréstimos";
+}
+
+<div class="page-header">
+    <h1 class="h3 mb-1">Histórico de empréstimos</h1>
+    <p class="text-muted small mb-0">Todas as movimentações registradas no sistema</p>
+</div>
+
+<div class="app-panel p-0 overflow-hidden mb-3">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Usuário</th>
+                    <th>Livro</th>
+                    <th>Início</th>
+                    <th>Previsão</th>
+                    <th>Devolução</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var item in Model) {
+                <tr>
+                    <td>@item.Usuario?.Nome</td>
+                    <td>@item.Livro?.Titulo</td>
+                    <td>@item.DataInicio.ToString("dd/MM/yyyy")</td>
+                    <td>@item.DataFim.ToString("dd/MM/yyyy")</td>
+                    <td>
+                        @if (item.DataDevolucaoReal.HasValue)
+                        {
+                            @item.DataDevolucaoReal.Value.ToString("dd/MM/yyyy")
+                        }
+                        else
+                        {
+                            <span class="text-muted">—</span>
+                        }
+                    </td>
+                    <td>
+                        @if (item.DataDevolucaoReal == null)
+                        {
+                            @if (item.AguardandoAprovacao)
+                            {
+                                <span class="badge text-bg-secondary">Pendente</span>
+                            }
+                            else if (item.DataFim < DateTime.Now)
+                            {
+                                <span class="badge text-bg-light border text-dark">Atrasado</span>
+                            }
+                            else
+                            {
+                                <span class="badge text-bg-warning text-dark">Ativo</span>
+                            }
+                        }
+                        else
+                        {
+                            <span class="badge text-bg-light border text-dark">Devolvido</span>
+                        }
+                    </td>
+                    <td class="text-end">
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">Abrir</a>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index" class="btn btn-outline-secondary">Voltar à operação</a>
+</div>

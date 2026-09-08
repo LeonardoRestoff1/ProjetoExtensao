@@ -1,0 +1,117 @@
+﻿@model BibliotecaOnline.ViewModels.HomeIndexViewModel
+@{
+    ViewData["Title"] = "Início";
+    ViewData["NavSection"] = "home";
+    var role = Context.Session.GetString(SessionAuth.AuthRoleKey);
+    var isUser = role == SessionAuth.RoleUser;
+}
+
+@* Hero *@
+<div class="app-panel p-4 p-md-5 mb-4 d-flex flex-column flex-md-row align-items-md-center gap-4" style="background: linear-gradient(135deg,#e7f1ff 0%,#f8f9fa 100%);">
+    <div class="flex-grow-1">
+        <h1 class="h2 fw-bold mb-2" style="color:#1a1d21">
+            <i class="bi bi-book-half text-primary me-2"></i>Biblioteca Online
+        </h1>
+        <p class="mb-3 text-muted" style="max-width:520px">
+            Acesse o acervo completo, solicite empréstimos e acompanhe suas devoluções — tudo em um só lugar.
+        </p>
+        <div class="d-flex flex-wrap gap-2">
+            <a asp-controller="Livros" asp-action="Index" class="btn btn-primary px-4">
+                <i class="bi bi-search me-1"></i> Ver acervo
+            </a>
+            @if (string.IsNullOrEmpty(role))
+            {
+                <a asp-controller="Account" asp-action="Register" class="btn btn-outline-primary px-4">
+                    <i class="bi bi-person-plus me-1"></i> Criar conta
+                </a>
+            }
+        </div>
+    </div>
+    <div class="text-center d-none d-md-block" style="opacity:.35">
+        <i class="bi bi-journal-bookmark" style="font-size:6rem;color:#0d6efd"></i>
+    </div>
+</div>
+
+@* KPIs *@
+<h2 class="h6 text-uppercase text-muted fw-semibold mb-3">
+    <i class="bi bi-bar-chart-line me-1"></i>Indicadores
+</h2>
+<div class="row g-3 mb-4">
+    <div class="col-sm-4">
+        <div class="stat-tile stat-tile-primary">
+            <div class="value">@Model.LivrosDisponiveis.ToString("N0")</div>
+            <div class="label"><i class="bi bi-collection me-1"></i>Exemplares disponíveis</div>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="stat-tile @(isUser && Model.MeusEmprestimosAtivos > 0 ? "stat-tile-success" : "")">
+            <div class="value">@Model.MeusEmprestimosAtivos.ToString("N0")</div>
+            <div class="label"><i class="bi bi-bookmark-check me-1"></i>Seus empréstimos em aberto</div>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="stat-tile @(isUser && Model.ProximosVencimentos > 0 ? "stat-tile-warning" : "")">
+            <div class="value">@Model.ProximosVencimentos.ToString("N0")</div>
+            <div class="label"><i class="bi bi-clock-history me-1"></i>Vencendo em até 3 dias</div>
+        </div>
+    </div>
+</div>
+@if (!isUser)
+{
+    <p class="text-muted small mb-4">
+        <a asp-controller="Account" asp-action="Login" class="text-decoration-none">
+            <i class="bi bi-box-arrow-in-right me-1"></i>Entre como usuário
+        </a> para visualizar indicadores personalizados.
+    </p>
+}
+
+@* Sugestões *@
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <h2 class="h5 mb-0"><i class="bi bi-stars me-1 text-warning"></i>Sugestões do acervo</h2>
+    <a asp-controller="Livros" asp-action="Index" class="btn btn-sm btn-outline-primary">
+        Ver acervo completo <i class="bi bi-arrow-right ms-1"></i>
+    </a>
+</div>
+
+@if (!Model.LivrosRecomendados.Any())
+{
+    <div class="empty-state">
+        <i class="bi bi-inbox"></i>
+        <p class="mb-0">Nenhum livro no acervo ainda.</p>
+    </div>
+}
+else
+{
+    <div class="row g-3">
+        @foreach (var livro in Model.LivrosRecomendados)
+        {
+            var disponivel = livro.Quantidade > 0;
+            <div class="col-md-4">
+                <div class="app-panel p-3 h-100 d-flex flex-column book-card">
+                    <div class="book-cover-placeholder mb-3">
+                        <i class="bi bi-book"></i>
+                    </div>
+                    <div class="fw-semibold mb-1">@livro.Titulo</div>
+                    <div class="text-muted small mb-1">@livro.Autor</div>
+                    @if (!string.IsNullOrEmpty(livro.Categoria))
+                    {
+                        <span class="badge bg-light text-secondary border small mb-2" style="width:fit-content">@livro.Categoria</span>
+                    }
+                    <div class="mt-auto pt-2 d-flex justify-content-between align-items-center">
+                        <a asp-controller="Livros" asp-action="Details" asp-route-id="@livro.Id" class="small text-decoration-none">
+                            Detalhes <i class="bi bi-arrow-right"></i>
+                        </a>
+                        @if (disponivel)
+                        {
+                            <span class="status-badge status-ativo"><i class="bi bi-check-circle-fill"></i>Disponível</span>
+                        }
+                        else
+                        {
+                            <span class="status-badge status-devolvido"><i class="bi bi-x-circle"></i>Indisponível</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

@@ -1,0 +1,56 @@
+@model BibliotecaOnline.Models.Emprestimo
+
+@{
+    ViewData["Title"] = "Registrar Empréstimo";
+}
+
+<h1>Registrar Novo Empréstimo</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="mb-3">
+                <label asp-for="IdUsuario" class="form-label">Usuário</label>
+                <select asp-for="IdUsuario" class="form-select" asp-items="ViewBag.IdUsuario">
+                    <option value="">Selecione um usuário</option>
+                </select>
+                <span asp-validation-for="IdUsuario" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="IdLivro" class="form-label">Livro</label>
+                <select asp-for="IdLivro" class="form-select" asp-items="ViewBag.IdLivro">
+                    <option value="">Selecione um livro</option>
+                </select>
+                <span asp-validation-for="IdLivro" class="text-danger"></span>
+                <small class="form-text text-muted">Apenas livros com exemplares disponíveis serão exibidos.</small>
+            </div>
+            <div class="mb-3">
+                <label asp-for="DataInicio" class="form-label"></label>
+                <input asp-for="DataInicio" class="form-control" type="date" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                <span asp-validation-for="DataInicio" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="DataFim" class="form-label"></label>
+                <input asp-for="DataFim" class="form-control" type="date" value="@DateTime.Now.AddDays(7).ToString("yyyy-MM-dd")" />
+                <span asp-validation-for="DataFim" class="text-danger"></span>
+                <small class="form-text text-muted">Data prevista para devolução (padrão: 7 dias).</small>
+            </div>
+            <div class="mb-3">
+                <input type="submit" value="Registrar Empréstimo" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
+
+
+
+
+

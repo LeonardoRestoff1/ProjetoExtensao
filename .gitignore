@@ -1,0 +1,24 @@
+## Build
+bin/
+obj/
+publish/
+out/
+
+## IDE
+.vs/
+.vscode/
+*.user
+*.suo
+
+## Banco local
+*.db
+*.db-shm
+*.db-wal
+
+## Logs e temporários
+*.log
+*.tmp
+
+## SO
+Thumbs.db
+.DS_Store

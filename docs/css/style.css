@@ -1,0 +1,146 @@
+:root {
+  --bg: #f4f6f8;
+  --text: #1a1d21;
+  --muted: #6c757d;
+  --primary: #0d6efd;
+  --panel: #ffffff;
+  --border: #e9ecef;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+}
+
+.container {
+  width: min(960px, 92%);
+  margin: 0 auto;
+}
+
+.hero {
+  background: linear-gradient(135deg, #0d6efd, #084298);
+  color: #fff;
+  padding: 3rem 0 2.5rem;
+  margin-bottom: 2rem;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  opacity: 0.85;
+}
+
+.hero h1 {
+  margin: 0.25rem 0 0.75rem;
+  font-size: clamp(2rem, 5vw, 2.75rem);
+}
+
+.lead {
+  max-width: 720px;
+  font-size: 1.05rem;
+  opacity: 0.95;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.65rem 1.1rem;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.btn.primary {
+  background: #fff;
+  color: var(--primary);
+}
+
+.btn.secondary {
+  border: 1px solid rgba(255,255,255,0.65);
+  color: #fff;
+}
+
+section {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+h2 {
+  margin-top: 0;
+  font-size: 1.25rem;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tags span {
+  background: #e7f1ff;
+  color: #084298;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.875rem;
+}
+
+.features {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.diagram {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid var(--border);
+  padding: 0.6rem 0.75rem;
+  text-align: left;
+}
+
+th {
+  background: #f8f9fa;
+}
+
+pre {
+  background: #f8f9fa;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+footer {
+  padding: 2rem 0 3rem;
+  color: var(--muted);
+}
+
+.small {
+  font-size: 0.875rem;
+}
+
+@media (max-width: 640px) {
+  .hero { padding: 2rem 0; }
+}
